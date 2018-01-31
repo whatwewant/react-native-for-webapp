@@ -1,15 +1,23 @@
 import React, { PureComponent } from 'react';
 import {
+  Button,
+  View,
   WebView,
   StyleSheet,
   Linking,
+  TouchableOpacity,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import isUrl from 'is-url';
 
 export default class Browser extends PureComponent {
   static navigationOptions = ({ navigation }) => {
-    const { title } = navigation.state.params;
-    // alert(title);
+    // alert(JSON.stringify(navigation.state.params));
+    const { title, canGoBack, goBack: webViewGoBack } = navigation.state.params;
+    const { goBack: navigationGoBack } = navigation;
+    
+    const goBack = canGoBack ? webViewGoBack : navigationGoBack;
+    const close = navigationGoBack;
     return {
       title: !title ? '加载中...' : title,
       headerMode: "normal",
@@ -19,7 +27,34 @@ export default class Browser extends PureComponent {
       headerTitleStyle: {
         color: '#fff',
       },
-      headerTintColor: '#fff',
+      // headerTintColor: '#fff',
+      headerLeft: (
+        <View style={styles.headerLeft}>
+          <TouchableOpacity
+            style={styles.headerLeftIcon}
+            onPress={() => goBack()}
+          >
+            <Ionicons
+              name="ios-arrow-back"
+              size={26}
+              style={{
+                color: '#fff',
+              }}
+            />
+          </TouchableOpacity>
+          {canGoBack ? (
+            <TouchableOpacity style={styles.headerLeftIcon} onPress={() => close()}>
+              <Ionicons
+                name="md-close"
+                size={26}
+                style={{
+                  color: '#fff',
+                }}
+              />
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      ),
     };
   };
 
@@ -28,6 +63,12 @@ export default class Browser extends PureComponent {
     onDone: () => null,
   };
 
+  componentDidMount() {
+    this.props.navigation.setParams({
+      goBack: this.node.goBack,
+    });
+  }
+
   onDone = () => {
     this.props.onDone();
     // setTimeout(() => this.props.navigation.setParams({ title: nav.title }), 250);
@@ -35,7 +76,7 @@ export default class Browser extends PureComponent {
 
   onNavigationStateChange = (nav) => {
     const { onLoading } = this.props;
-    this.props.navigation.setParams({ title: nav.title });
+    this.props.navigation.setParams({ title: nav.title, canGoBack: nav.canGoBack });
 
     if (nav.loading === true) {
       onLoading();
@@ -46,14 +87,13 @@ export default class Browser extends PureComponent {
     }
   };
 
-  componentDidMount() {}
-
   render() {
     const params = this.props.navigation && this.props.navigation.state.params || {};
     const uri = params.url || params.uri || this.props.source.uri;
 
     return (
       <WebView
+        ref={ref => (this.node = ref)}
         style={styles.conatiner}
         source={{ uri: uri }}
         onNavigationStateChange={this.onNavigationStateChange}
@@ -71,5 +111,15 @@ export default class Browser extends PureComponent {
 const styles = StyleSheet.create({
   conatiner: {
     flex: 1,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    paddingLeft: 12,
+  },
+  headerLeftIcon: {
+    width: 32,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

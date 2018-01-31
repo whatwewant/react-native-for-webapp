@@ -7,7 +7,7 @@ import WebView from './WebView';
 
 const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBar.currentHeight;
 
-class App extends React.Component {
+class App extends React.PureComponent {
   static navigationOptions = {
     header: null,
   };

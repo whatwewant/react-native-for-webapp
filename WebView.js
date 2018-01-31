@@ -50,8 +50,6 @@ export default class XWebView extends PureComponent {
     return false;
   };
 
-  componentDidMount() {}
-
   render() {
     const params = this.props.navigation && this.props.navigation.state.params || {};
     const uri = params.url || params.uri || this.props.source.uri;
