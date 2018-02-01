@@ -9,6 +9,7 @@ const App = ({ navigation }) => (
     navigation={navigation}
     headerBackgroundColor="#00BCD4"
     url="http://moeover.com/github-trending"
+    // url="https://google.com"
   />
 );
 
